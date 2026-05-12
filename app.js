@@ -19,9 +19,13 @@ const weatherCodes = {
   95: { label: "雷雨", icon: "⛈️" },
 };
 
+function normalizeCity(city) {
+  return city.replace(/[都道府県市区町村]$/, "");
+}
+
 async function getWeather() {
-  const city = document.getElementById("city-input").value.trim();
-  if (!city) return;
+  const raw = document.getElementById("city-input").value.trim();
+  if (!raw) return;
 
   const resultEl = document.getElementById("result");
   const errorEl = document.getElementById("error");
@@ -29,6 +33,7 @@ async function getWeather() {
   errorEl.classList.add("hidden");
 
   try {
+    const city = normalizeCity(raw);
     const geoRes = await fetch(
       `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=ja`,
     );
