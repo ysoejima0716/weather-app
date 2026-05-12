@@ -78,8 +78,10 @@ function renderHistory() {
 
 function setLoading(on) {
   document.getElementById("loading").classList.toggle("hidden", !on);
-  document.getElementById("result").classList.add("hidden");
-  document.getElementById("error").classList.add("hidden");
+  if (on) {
+    document.getElementById("result").classList.add("hidden");
+    document.getElementById("error").classList.add("hidden");
+  }
   document.getElementById("search-btn").disabled = on;
   document.getElementById("location-btn").disabled = on;
 }
