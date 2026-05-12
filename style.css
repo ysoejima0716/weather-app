@@ -66,6 +66,14 @@ button:hover {
   opacity: 0.85;
 }
 
+#location-btn {
+  width: 100%;
+  margin-bottom: 24px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
 .result {
   animation: fadeIn 0.4s ease;
 }

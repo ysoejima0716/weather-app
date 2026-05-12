@@ -28,6 +28,75 @@ async function geocode(query) {
   return { lat: data[0].lat, lon: data[0].lon, name: data[0].name };
 }
 
+async function reverseGeocode(lat, lon) {
+  const res = await fetch(
+    `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=ja`,
+  );
+  const data = await res.json();
+  return data.name || data.display_name || "現在地";
+}
+
+async function showWeatherByCoords(lat, lon, name) {
+  const resultEl = document.getElementById("result");
+  const errorEl = document.getElementById("error");
+  resultEl.classList.add("hidden");
+  errorEl.classList.add("hidden");
+
+  const weatherRes = await fetch(
+    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code`,
+  );
+  const weatherData = await weatherRes.json();
+  const current = weatherData.current;
+  const code = weatherCodes[current.weather_code] ?? {
+    label: "不明",
+    icon: "🌡️",
+  };
+
+  document.getElementById("city-name").textContent = name;
+  document.getElementById("weather-icon").textContent = code.icon;
+  document.getElementById("temperature").textContent =
+    `${Math.round(current.temperature_2m)}°C`;
+  document.getElementById("description").textContent = code.label;
+  document.getElementById("humidity").textContent =
+    `${current.relative_humidity_2m}%`;
+  document.getElementById("wind").textContent =
+    `${current.wind_speed_10m} km/h`;
+
+  resultEl.classList.remove("hidden");
+}
+
+async function getCurrentLocationWeather() {
+  if (!navigator.geolocation) {
+    alert("このブラウザは位置情報に対応していません");
+    return;
+  }
+  const btn = document.getElementById("location-btn");
+  btn.textContent = "📍 取得中...";
+  btn.disabled = true;
+
+  navigator.geolocation.getCurrentPosition(
+    async (pos) => {
+      try {
+        const { latitude: lat, longitude: lon } = pos.coords;
+        const name = await reverseGeocode(lat, lon);
+        await showWeatherByCoords(lat, lon, name);
+      } catch {
+        document.getElementById("error").classList.remove("hidden");
+      } finally {
+        btn.textContent = "📍 現在地";
+        btn.disabled = false;
+      }
+    },
+    () => {
+      alert(
+        "位置情報を取得できませんでした。ブラウザの設定を確認してください。",
+      );
+      btn.textContent = "📍 現在地";
+      btn.disabled = false;
+    },
+  );
+}
+
 async function getWeather() {
   const raw = document.getElementById("city-input").value.trim();
   if (!raw) return;
@@ -73,6 +142,9 @@ async function getWeather() {
   }
 }
 
+document
+  .getElementById("location-btn")
+  .addEventListener("click", getCurrentLocationWeather);
 document.getElementById("search-btn").addEventListener("click", getWeather);
 document.getElementById("city-input").addEventListener("keydown", (e) => {
   if (e.key === "Enter") getWeather();
