@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>天気アプリ</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>天気アプリ</h1>
+      <div class="search-box">
+        <input
+          type="text"
+          id="city-input"
+          placeholder="都市名を入力（例：Tokyo）"
+        />
+        <button id="search-btn">検索</button>
+      </div>
+      <div id="result" class="result hidden">
+        <div class="city-name" id="city-name"></div>
+        <div class="weather-icon" id="weather-icon"></div>
+        <div class="temperature" id="temperature"></div>
+        <div class="description" id="description"></div>
+        <div class="details">
+          <div class="detail-item">
+            <span class="label">湿度</span>
+            <span id="humidity"></span>
+          </div>
+          <div class="detail-item">
+            <span class="label">風速</span>
+            <span id="wind"></span>
+          </div>
+        </div>
+      </div>
+      <div id="error" class="error hidden">都市が見つかりませんでした。</div>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>
