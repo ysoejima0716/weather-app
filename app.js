@@ -19,24 +19,13 @@ const weatherCodes = {
   95: { label: "雷雨", icon: "⛈️" },
 };
 
-function buildCandidates(city) {
-  const candidates = [city];
-  const step1 = city.replace(/[都道府県市区町村]$/, "");
-  if (step1 !== city) candidates.push(step1);
-  const step2 = step1.replace(
-    /(海岸|海水浴場|ビーチ|浜|山|川|湖|港|駅|温泉)$/,
-    "",
-  );
-  if (step2 !== step1) candidates.push(step2);
-  return candidates;
-}
-
-async function geocode(name) {
+async function geocode(query) {
   const res = await fetch(
-    `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=1&language=ja`,
+    `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1&accept-language=ja`,
   );
   const data = await res.json();
-  return data.results?.[0] ?? null;
+  if (!data.length) return null;
+  return { lat: data[0].lat, lon: data[0].lon, name: data[0].name };
 }
 
 async function getWeather() {
@@ -49,21 +38,17 @@ async function getWeather() {
   errorEl.classList.add("hidden");
 
   try {
-    let location = null;
-    for (const candidate of buildCandidates(raw)) {
-      location = await geocode(candidate);
-      if (location) break;
-    }
+    const location = await geocode(raw);
 
     if (!location) {
       errorEl.classList.remove("hidden");
       return;
     }
 
-    const { latitude, longitude, name, country } = location;
+    const { lat, lon, name } = location;
 
     const weatherRes = await fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code`,
+      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code`,
     );
     const weatherData = await weatherRes.json();
     const current = weatherData.current;
@@ -72,7 +57,7 @@ async function getWeather() {
       icon: "🌡️",
     };
 
-    document.getElementById("city-name").textContent = `${name}（${country}）`;
+    document.getElementById("city-name").textContent = name;
     document.getElementById("weather-icon").textContent = code.icon;
     document.getElementById("temperature").textContent =
       `${Math.round(current.temperature_2m)}°C`;
