@@ -20,7 +20,9 @@ const weatherCodes = {
 };
 
 function normalizeCity(city) {
-  return city.replace(/[都道府県市区町村]$/, "");
+  return city
+    .replace(/[都道府県市区町村]$/, "")
+    .replace(/(海岸|海水浴場|ビーチ|浜|島|山|川|湖|港|駅|温泉)$/, "");
 }
 
 async function getWeather() {
