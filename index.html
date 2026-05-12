@@ -18,6 +18,14 @@
         <button id="search-btn">検索</button>
       </div>
       <button id="location-btn">📍 現在地</button>
+
+      <div id="history" class="history hidden"></div>
+
+      <div id="loading" class="loading hidden">
+        <div class="spinner"></div>
+        <span>取得中...</span>
+      </div>
+
       <div id="result" class="result hidden">
         <div class="city-name" id="city-name"></div>
         <div class="weather-icon" id="weather-icon"></div>
@@ -33,8 +41,10 @@
             <span id="wind"></span>
           </div>
         </div>
+        <div id="forecast" class="forecast"></div>
       </div>
-      <div id="error" class="error hidden">都市が見つかりませんでした。</div>
+
+      <div id="error" class="error hidden"></div>
     </div>
     <script src="app.js"></script>
   </body>
